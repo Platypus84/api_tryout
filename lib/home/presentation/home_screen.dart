@@ -15,6 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<Map<String, dynamic>>? _futureDBResults;
   SearchController inputCtrl = SearchController();
   String? superheroName;
+  String? resultCount;
   Uri? uri;
 
   Future<Map<String, dynamic>> getData(String heroName) async {
@@ -26,7 +27,12 @@ class _HomeScreenState extends State<HomeScreen> {
     if (response.statusCode != 200) {
       debugPrint("Fehler bei der Datenabfrage: ${response.statusCode}");
     }
-    final List<dynamic> data = jsonDecode(response.body);
+    final data = jsonDecode(response.body) as List<dynamic>;
+    // Reminder: jsonDecode parses a JSON string and returns a Dart object,
+    // which will be a Map<String, dynamic> if the JSON represents an object,
+    // or a List<dynamic> if it represents an array.
+
+    debugPrint(data.toString());
     // final Map<String, dynamic> heroes = data.asMap().cast<String, dynamic>();
     final heroes = data
         .where(
@@ -37,7 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // final hero = data.entries.firstWhere(
     //   (entry) => entry.key == 'name' && entry.value == 'Batman',
     // );
-    debugPrint(heroes.toString());
+
+    debugPrint(heroes.length.toString());
+    resultCount = heroes.length.toString();
     return heroes[0];
   }
 
@@ -57,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return MaterialApp(
       theme: appTheme,
       home: Scaffold(
-        appBar: AppBar(title: const Text('SuperHero API')),
+        appBar: AppBar(title: const Text('Superhero Database')),
         body: SafeArea(
           child: Center(
             child: Padding(
@@ -78,8 +86,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     elevation: WidgetStatePropertyAll(1),
                   ),
                   SizedBox(height: 64),
+                  // ?resultCount != null
+                  //     ? Text('Ergebnisse: $resultCount')
+                  //     : null,
                   SizedBox(
-                    width: 300,
+                    width: 320,
                     child: Card(
                       color: Color.fromRGBO(90, 89, 104, 1),
                       child: Padding(
@@ -110,6 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               final img = snapshot.data!['images']['sm'];
                               final name = '${snapshot.data!['name']}';
                               final bio = snapshot.data!['biography'];
+                              final Map<String, dynamic> appearance =
+                                  snapshot.data!['appearance'];
                               final Map<String, dynamic> powers =
                                   snapshot.data!['powerstats'];
 
@@ -143,6 +156,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
+                                          color: Color.fromARGB(
+                                            255,
+                                            255,
+                                            225,
+                                            141,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -150,10 +169,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   SizedBox(height: 32),
                                   Text(
                                     'Bio',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.headlineMedium,
                                   ),
+                                  SizedBox(height: 8),
                                   Column(
                                     children: [
                                       Row(
@@ -169,45 +189,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ],
                                       ),
                                       Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Alter Egos: ',
+                                            'Geburtsort: ',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
 
-                                          Text(bio['alterEgos']),
+                                          Expanded(
+                                            child: Text(bio['placeOfBirth']),
+                                          ),
                                         ],
                                       ),
                                       Row(
                                         children: [
                                           Text(
-                                            'Name: ',
+                                            'Größe: ',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
-                                          Text(bio['fullName']),
+
+                                          Text(appearance['height'][1]),
                                         ],
                                       ),
-
                                       Row(
                                         children: [
                                           Text(
-                                            'Name: ',
+                                            'Gewicht: ',
                                             style: TextStyle(
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
-
-                                          Text(bio['fullName']),
+                                          Text(appearance['weight'][1]),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 24),
-                                  Text('Eigenschaften'),
+                                  SizedBox(height: 32),
+                                  Text(
+                                    'Eigenschaften',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.headlineMedium,
+                                  ),
+                                  SizedBox(height: 8),
                                   Row(
                                     children: [
                                       Text(
