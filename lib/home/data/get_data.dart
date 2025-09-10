@@ -1,0 +1,4 @@
+
+getData() {
+  // http.get(...);
+}

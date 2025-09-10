@@ -1,4 +1,4 @@
-import 'package:api_tryout/home/home_screen.dart';
+import 'package:api_tryout/home/presentation/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
